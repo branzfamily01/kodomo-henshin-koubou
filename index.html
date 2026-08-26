@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1024">
+<title>ビートポン工房｜こどもへんしん工房</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <div class="shell">
+    <!-- =====================================================
+         [1] 初回セットアップ画面
+         ===================================================== -->
+    <section id="setupScreen" class="screen" hidden>
+      <div class="hero">
+        <div class="logo-mark" aria-hidden="true"></div>
+        <div class="stack">
+          <span class="eyebrow">おうちのひとへ</span>
+          <h1>ビートポン工房</h1>
+          <p class="lead">こどもがじぶんで音を組み立てる、ちいさな音楽スタジオです。最初に営業時間だけ決めます。</p>
+        </div>
+      </div>
+      <div class="card setup-card">
+        <label class="label">おうちのひと用パスワード
+          <input id="setupPassword" class="field" type="password" minlength="4" autocomplete="new-password" placeholder="4文字以上">
+        </label>
+        <div class="stack">
+          <div class="label">1日の営業時間</div>
+          <div class="preset-grid" id="setupPresets">
+            <button class="btn small" type="button" data-min="10">10分</button>
+            <button class="btn small" type="button" data-min="15">15分</button>
+            <button class="btn small" type="button" data-min="20">20分</button>
+            <button class="btn small" type="button" data-min="30">30分</button>
+          </div>
+          <input id="setupMinutes" class="field" type="number" min="1" max="240" inputmode="numeric" value="15" aria-label="1日の使用時間（分）">
+        </div>
+        <p class="hint">パスワードは平文では保存せず、SHA-256でハッシュ化して端末内に保存します。</p>
+        <div id="setupError" class="error" aria-live="polite"></div>
+        <button id="setupSubmit" class="btn primary full" type="button">工房をひらく</button>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         [2] ロック画面
+         ===================================================== -->
+    <section id="lockScreen" class="screen" hidden>
+      <div class="hero">
+        <div class="logo-mark" aria-hidden="true"></div>
+        <div class="stack">
+          <span class="eyebrow">10ぷんスタジオ</span>
+          <h1>ビートポン工房</h1>
+          <p id="lockMessage" class="lead">おうちのひとに あけてもらってね</p>
+        </div>
+      </div>
+      <div class="card stack">
+        <div id="lockOpenArea" class="lock-actions">
+          <input id="lockPassword" class="field" type="password" autocomplete="current-password" placeholder="パスワード" aria-label="パスワード">
+          <div id="lockError" class="error" aria-live="polite"></div>
+          <button id="lockSubmit" class="btn primary full" type="button">スタジオを あける</button>
+        </div>
+        <div id="closedMessage" class="stack center" hidden>
+          <div class="shutter" aria-hidden="true">🌙</div>
+          <h2>きょうのスタジオは おしまい！</h2>
+          <p class="lead">また あした つづきを つくろう。</p>
+        </div>
+        <button id="lockParent" class="btn ghost full" type="button">おうちのひと用</button>
+        <div class="lock-status"><span class="lock-dot"></span><span>さくひんは この端末に じどうほぞん</span></div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         [3] プロフィール選択画面
+         ===================================================== -->
+    <section id="profileScreen" class="screen" hidden>
+      <div class="hero">
+        <span class="eyebrow">WHO'S IN THE STUDIO?</span>
+        <h1>だれのスタジオ？</h1>
+        <p class="lead">じぶんのボタンを おしてね。</p>
+      </div>
+      <div class="profile-grid">
+        <button class="profile" type="button" data-profile="0">
+          <span class="profile-avatar" aria-hidden="true">♪</span>
+          <span class="profile-name" id="profileName0">おねえちゃん</span>
+        </button>
+        <button class="profile" type="button" data-profile="1">
+          <span class="profile-avatar" aria-hidden="true">♫</span>
+          <span class="profile-name" id="profileName1">おとうと</span>
+        </button>
+      </div>
+      <div class="center" style="margin-top:var(--sp-5)">
+        <button id="profileBack" class="btn ghost" type="button">← もどる</button>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         [4] ホーム画面
+         ===================================================== -->
+    <section id="homeScreen" class="screen" hidden>
+      <div class="studio-header" data-studio-header></div>
+      <div class="stack">
+        <div class="card daily-card">
+          <div id="todayCount" class="daily-number">0</div>
+          <div class="stack" style="gap:var(--sp-1)">
+            <span class="eyebrow">TODAY</span>
+            <h2>きょうの へんしん</h2>
+            <p id="todayText" class="muted">まだ 0こ。さいしょのビートを つくろう。</p>
+          </div>
+        </div>
+        <div class="home-actions">
+          <button id="goMaker" class="big-action" type="button">
+            <span class="icon" aria-hidden="true">🥁</span>
+            <strong>ビートを つくる</strong>
+            <span>ドン・タン・チキ・ポンを ならべて、じぶんのリズムをつくる。</span>
+          </button>
+          <button id="goGallery" class="big-action" type="button">
+            <span class="icon" aria-hidden="true">💿</span>
+            <strong>ギャラリー</strong>
+            <span>できたきょくも、まだタネのきょくも、ぜんぶここにのこる。</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         [5] ビートメーカー画面
+         ===================================================== -->
+    <section id="makerScreen" class="screen" hidden>
+      <div class="studio-header" data-studio-header></div>
+      <div class="maker-top">
+        <div class="row between">
+          <button id="makerBack" class="btn ghost small" type="button">← ホーム</button>
+          <span id="editBadge" class="pill">あたらしいきょく</span>
+        </div>
+        <div class="card transport">
+          <button id="playButton" class="play-btn" type="button" aria-label="再生">▶</button>
+          <div class="tempo">
+            <div class="row between"><strong>テンポ</strong><span id="bpmValue" class="pill">112 BPM</span></div>
+            <div class="tempo-row">
+              <button id="bpmMinus" class="btn small" type="button" aria-label="テンポを下げる">−</button>
+              <input id="bpmRange" class="range" type="range" min="80" max="160" step="1" value="112" aria-label="テンポ">
+              <button id="bpmPlus" class="btn small" type="button" aria-label="テンポを上げる">＋</button>
+            </div>
+          </div>
+          <span class="pill">4×16</span>
+        </div>
+        <div class="step-pages">
+          <button class="btn page-btn" type="button" data-page="0" aria-pressed="true">1–8</button>
+          <button class="btn page-btn" type="button" data-page="1" aria-pressed="false">9–16</button>
+        </div>
+      </div>
+      <div class="card sequence-card">
+        <div id="stepHead" class="step-head"></div>
+        <div id="sequenceGrid"></div>
+        <div id="overview" class="overview" aria-label="16ステップの概要"></div>
+      </div>
+      <div class="card maker-save">
+        <label class="label">きょくの なまえ
+          <input id="workTitle" class="field" type="text" maxlength="40" placeholder="かかなくてもOK">
+        </label>
+        <div class="save-actions">
+          <button id="saveSeed" class="btn full" type="button">🌱 タネのまま ほぞん</button>
+          <button id="saveDone" class="btn cyan full" type="button">✓ ほぞん</button>
+        </div>
+        <p class="hint">「タネ」は未完成のしるし。タネも、たいせつな作品としてギャラリーに残ります。</p>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         [6] ギャラリー画面
+         ===================================================== -->
+    <section id="galleryScreen" class="screen" hidden>
+      <div class="studio-header" data-studio-header></div>
+      <div class="row between" style="margin-bottom:var(--sp-4)">
+        <div>
+          <span class="eyebrow">MY SOUNDS</span>
+          <h2>ギャラリー</h2>
+        </div>
+        <button id="galleryBack" class="btn ghost small" type="button">← ホーム</button>
+      </div>
+      <div id="galleryList" class="gallery-list"></div>
+    </section>
+  </div>
+</div>
+
+<!-- =======================================================
+     [7] 閉店オーバーレイ＋延長
+     ======================================================= -->
+<div id="closingOverlay" class="overlay" hidden>
+  <div class="overlay-inner">
+    <div class="shutter" aria-hidden="true">🎚️</div>
+    <div class="stack">
+      <span class="eyebrow">STUDIO CLOSED</span>
+      <h1>ガラガラ…<br>きょうの工房は へいてん！</h1>
+      <p class="lead">いま作っていたビートは、ちゃんと「タネ」としてほぞんしたよ。</p>
+    </div>
+    <div class="card stack">
+      <h3>きょう作ったもの</h3>
+      <div id="closingWorks" class="today-chips"></div>
+      <strong>また あした！</strong>
+    </div>
+    <button id="showExtend" class="btn ghost" type="button">おうちのひと用：じかんをのばす</button>
+    <div id="extendBox" class="card extend-box" hidden>
+      <label class="label">パスワード
+        <input id="extendPassword" class="field" type="password" autocomplete="current-password" placeholder="おうちのひと用">
+      </label>
+      <div id="extendError" class="error" aria-live="polite"></div>
+      <div class="extend-grid">
+        <button class="btn" type="button" data-extend="5">+5分</button>
+        <button class="btn" type="button" data-extend="10">+10分</button>
+        <button class="btn" type="button" data-extend="15">+15分</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =======================================================
+     [8] 親パネル・認証モーダル
+     ======================================================= -->
+<div id="parentAuthModal" class="modal" hidden>
+  <div class="modal-card stack">
+    <div class="row between"><h2>おうちのひと用</h2><button id="parentAuthClose" class="icon-btn" type="button" aria-label="閉じる">×</button></div>
+    <p class="lead">設定を変える前に、パスワードを入力してください。</p>
+    <input id="parentAuthPassword" class="field" type="password" autocomplete="current-password" placeholder="パスワード">
+    <div id="parentAuthError" class="error" aria-live="polite"></div>
+    <button id="parentAuthSubmit" class="btn primary full" type="button">設定をひらく</button>
+  </div>
+</div>
+
+<div id="parentPanel" class="modal" hidden>
+  <div class="modal-card">
+    <div class="row between"><div><span class="eyebrow">PARENT PANEL</span><h2>工房の設定</h2></div><button id="parentPanelClose" class="icon-btn" type="button" aria-label="閉じる">×</button></div>
+
+    <section class="parent-section">
+      <h3>営業時間</h3>
+      <label class="label">1日の使用時間（分）
+        <input id="parentDailyMin" class="field" type="number" min="1" max="240" inputmode="numeric">
+      </label>
+      <div class="two-col">
+        <button id="saveDailyMin" class="btn" type="button">営業時間を保存</button>
+        <button id="addFiveNow" class="btn" type="button">きょう +5分</button>
+      </div>
+      <p id="usageSummary" class="hint"></p>
+    </section>
+
+    <section class="parent-section">
+      <h3>プロフィール名</h3>
+      <div class="two-col">
+        <label class="label">プロフィール1<input id="parentName0" class="field" maxlength="20"></label>
+        <label class="label">プロフィール2<input id="parentName1" class="field" maxlength="20"></label>
+      </div>
+      <button id="saveNames" class="btn" type="button">名前を保存</button>
+    </section>
+
+    <section class="parent-section">
+      <h3>パスワード変更</h3>
+      <label class="label">新しいパスワード<input id="newPassword" class="field" type="password" minlength="4" autocomplete="new-password" placeholder="4文字以上"></label>
+      <button id="savePassword" class="btn" type="button">パスワードを変更</button>
+      <div id="parentError" class="error" aria-live="polite"></div>
+    </section>
+
+    <section class="parent-section">
+      <h3>作品の管理</h3>
+      <p class="hint">子ども画面では削除できません。ここだけで削除できます。</p>
+      <div id="parentWorks" class="parent-works"></div>
+    </section>
+
+    <section class="parent-section">
+      <h3>バックアップ / 復元</h3>
+      <textarea id="backupArea" class="field" spellcheck="false" placeholder="ここにバックアップJSONが表示されます。復元するときはJSONを貼り付けます。"></textarea>
+      <div class="two-col">
+        <button id="exportBackup" class="btn" type="button">JSONを書き出す</button>
+        <button id="restoreBackup" class="btn" type="button">貼り付けJSONから復元</button>
+      </div>
+      <p class="hint">バックアップには設定・利用時間・作品が含まれます。パスワードはハッシュ化された状態です。</p>
+    </section>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
